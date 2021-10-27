@@ -8,12 +8,12 @@ namespace Brainer.NetCore.Repository
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<Users>> Search(string name);
-        Task<IEnumerable<Users>> GetUsers();
-        Task<Users> GetUser(int id);
-        Task<Users> GetUserByEmail(string email);
-        Task<IEnumerable<Users>> AddUser(Users user);
-        Task<IEnumerable<Users>> UpdateUser(Users user);
+        Task<IEnumerable<User>> Search(string name);
+        Task<IEnumerable<User>> GetUsers();
+        Task<User> GetUser(int id);
+        Task<User> GetUserByEmail(string email);
+        Task<User> AddUser(User user);
+        Task<User> UpdateUser(User user);
         Task DeleteUser(int id);
     }
 }

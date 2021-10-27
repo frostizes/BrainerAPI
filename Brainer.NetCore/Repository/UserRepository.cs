@@ -18,11 +18,11 @@ namespace Brainer.NetCore.Repository
         }
 
 
-        public async Task<IEnumerable<Users>> AddUser(Users user)
+        public async Task<User> AddUser(User user)
         {
             var result = await appDBContext.Users.AddAsync(user);
             await appDBContext.SaveChangesAsync();
-            return (IEnumerable<Users>) result.Entity;
+            return result.Entity;
         }
 
         public async Task DeleteUser(int id)
@@ -35,33 +35,33 @@ namespace Brainer.NetCore.Repository
             }
         }
 
-        public async Task<Users> GetUser(int id)
+        public async Task<User> GetUser(int id)
         {
             return await appDBContext.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<Users> GetUserByEmail(string email)
+        public async Task<User> GetUserByEmail(string email)
         {
             return await appDBContext.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<IEnumerable<Users>> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
             return await appDBContext.Users.ToListAsync();
         }
 
-        public async Task<IEnumerable<Users>> Search(string name)
+        public async Task<IEnumerable<User>> Search(string email)
         {
-            IQueryable<Users> query = appDBContext.Users;
-            if (!string.IsNullOrEmpty(name))
+            IQueryable<User> query = appDBContext.Users;
+            if (!string.IsNullOrEmpty(email))
             {
-                query = query.Where(e => e.FirstName.Contains(name) || e.LastName.Contains(name));
+                query = query.Where(e => e.Email.Contains(email));
             }
 
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<Users>> UpdateUser(Users user)
+        public async Task<User> UpdateUser(User user)
         {
             var result = await appDBContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
             if(result != null)
@@ -71,7 +71,7 @@ namespace Brainer.NetCore.Repository
                 result.Email = user.Email;
 
                 await appDBContext.SaveChangesAsync();
-                return (IEnumerable<Users>)result;
+                return result;
             }
 
             return null;

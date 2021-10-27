@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Models
 {
-    public class BrainerExercise
+    public class BrainerExercise : Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
