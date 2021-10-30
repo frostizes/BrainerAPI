@@ -1,5 +1,7 @@
 ﻿using Brainer.NetCore.Models;
 using Brainer.NetCore.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,13 +13,14 @@ namespace Brainer.NetCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class CustomersController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
+        private readonly ICustomerRepository customerRepository;
 
-        public UsersController(IUserRepository userRepository)
+        public CustomersController(ICustomerRepository customerRepository)
         {
-            this.userRepository = userRepository;
+            this.customerRepository = customerRepository;
         }
 
         //api/users
@@ -27,7 +30,7 @@ namespace Brainer.NetCore.Controllers
         {
             try
             {
-                return Ok(await userRepository.GetUsers());
+                return Ok(await customerRepository.GetUsers());
             }
             catch (Exception)
             {
@@ -38,11 +41,11 @@ namespace Brainer.NetCore.Controllers
         //api/users/10
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<Customer>> GetUser(int id)
         {
             try
             {
-                var result = await userRepository.GetUser(id);
+                var result = await customerRepository.GetUser(id);
                 if(result == null)
                 {
                     return NotFound();
@@ -62,20 +65,20 @@ namespace Brainer.NetCore.Controllers
         //api/users
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<Customer>> CreateUser(Customer user)
         {
             try
             {
                 if (user == null)
                     return BadRequest();
 
-                var userCheck = await userRepository.GetUserByEmail(user.Email);
+                var userCheck = await customerRepository.GetUserByEmail(user.Email);
                 if(userCheck != null)
                 {
                     ModelState.AddModelError("Email", "email already used");
                     return BadRequest();
                 }
-                var createdUser = await userRepository.AddUser(user);
+                var createdUser = await customerRepository.AddUser(user);
                 return CreatedAtAction(nameof(GetUser),
                     new {id = createdUser.Id}, createdUser);
             }
@@ -89,20 +92,20 @@ namespace Brainer.NetCore.Controllers
         //api/users
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<User>> UpdateUser(int id, User user)
+        public async Task<ActionResult<Customer>> UpdateUser(int id, Customer user)
         {
             try
             {
                 if (id != user.Id)
                     return BadRequest("user id mismatch");
 
-                var userToUpdate = await userRepository.GetUser(id);
+                var userToUpdate = await customerRepository.GetUser(id);
                 if (userToUpdate == null)
                 {
                     return NotFound($"Employee with id = {id} not found");
                 }
 
-                return await userRepository.UpdateUser(user);
+                return await customerRepository.UpdateUser(user);
             }
             catch (Exception)
             {
@@ -116,13 +119,13 @@ namespace Brainer.NetCore.Controllers
             try
             {
                
-                var userToDelete = await userRepository.GetUser(id);
+                var userToDelete = await customerRepository.GetUser(id);
                 if (userToDelete == null)
                 {
                     return NotFound($"Employee with id = {id} not found");
                 }
 
-                await userRepository.DeleteUser(id);
+                await customerRepository.DeleteUser(id);
                 return Ok($"Employee with Id = {id} deleted");
             }
             catch (Exception)
@@ -133,11 +136,11 @@ namespace Brainer.NetCore.Controllers
         }
 
         [HttpGet("{search}")]
-        public async Task<ActionResult<IEnumerable<User>>> Search(string email)
+        public async Task<ActionResult<IEnumerable<Customer>>> Search(string email)
         {
             try
             {
-                var result  = await userRepository.Search(email);
+                var result  = await customerRepository.Search(email);
                 if (result.Any())
                 {
                     return Ok(result);

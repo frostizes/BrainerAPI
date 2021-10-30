@@ -7,52 +7,52 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Repository
 {
-    public class UserRepository : IUserRepository
+    public class CustomerRepository : ICustomerRepository
     {
 
         private readonly AppDBContext appDBContext;
 
-        public UserRepository(AppDBContext appDBContext)
+        public CustomerRepository(AppDBContext appDBContext)
         {
             this.appDBContext = appDBContext;
         }
 
 
-        public async Task<User> AddUser(User user)
+        public async Task<Customer> AddUser(Customer user)
         {
-            var result = await appDBContext.Users.AddAsync(user);
+            var result = await appDBContext.Customer.AddAsync(user);
             await appDBContext.SaveChangesAsync();
             return result.Entity;
         }
 
         public async Task DeleteUser(int id)
         {
-            var result = appDBContext.Users.FirstOrDefault(u => u.Id == id);
+            var result = appDBContext.Customer.FirstOrDefault(u => u.Id == id);
             if(result != null)
             {
-                appDBContext.Users.Remove(result);
+                appDBContext.Customer.Remove(result);
                 await appDBContext.SaveChangesAsync();
             }
         }
 
-        public async Task<User> GetUser(int id)
+        public async Task<Customer> GetUser(int id)
         {
-            return await appDBContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await appDBContext.Customer.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<Customer> GetUserByEmail(string email)
         {
-            return await appDBContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return await appDBContext.Customer.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<IEnumerable<User>> GetUsers()
+        public async Task<IEnumerable<Customer>> GetUsers()
         {
-            return await appDBContext.Users.ToListAsync();
+            return await appDBContext.Customer.ToListAsync();
         }
 
-        public async Task<IEnumerable<User>> Search(string email)
+        public async Task<IEnumerable<Customer>> Search(string email)
         {
-            IQueryable<User> query = appDBContext.Users;
+            IQueryable<Customer> query = appDBContext.Customer;
             if (!string.IsNullOrEmpty(email))
             {
                 query = query.Where(e => e.Email.Contains(email));
@@ -61,9 +61,9 @@ namespace Brainer.NetCore.Repository
             return await query.ToListAsync();
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<Customer> UpdateUser(Customer user)
         {
-            var result = await appDBContext.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+            var result = await appDBContext.Customer.FirstOrDefaultAsync(u => u.Id == user.Id);
             if(result != null)
             {
                 result.FirstName = user.FirstName;

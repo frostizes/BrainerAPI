@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Models
 {
-    public class User : Entity
+    public class Customer : Entity
     {
         public int Id { get; set; }
 
