@@ -8,7 +8,6 @@ namespace Brainer.NetCore.Models
 {
     public class Customer : Entity
     {
-        public int Id { get; set; }
 
         [Required]
         [MinLength(2)]

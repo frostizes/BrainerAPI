@@ -1,6 +1,7 @@
 using Brainer.NetCore.Configuration;
 using Brainer.NetCore.Models;
 using Brainer.NetCore.Repository;
+using Brainer.NetCore.Repository.interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,7 +64,9 @@ namespace Brainer.NetCore
 
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IBrainerExerciseRepository, BrainerExerciseRepository>();
+            services.AddScoped<IExerciseRepository, ExerciseRepository>();
+            services.AddScoped<IQuestionRepository, QuestionRepository>();
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -81,6 +84,11 @@ namespace Brainer.NetCore
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Brainer.NetCore v1"));
             }
+
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
             app.UseHttpsRedirection();
 

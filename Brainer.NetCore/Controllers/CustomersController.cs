@@ -13,7 +13,7 @@ namespace Brainer.NetCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerRepository customerRepository;

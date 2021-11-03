@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Models
 {
-    public interface Entity
+    public class Entity
     {
         public int Id { get; set; }
     }

@@ -1,0 +1,22 @@
+﻿tables :
+	-users
+		-Score global
+		
+	-exercises
+		-Id
+		-ExerciseType
+		-Best score
+		-timer
+		-questions
+		-difficulty
+		-
+
+	-score
+		-Id
+		-UserId
+		-ExerciseId
+		-Score
+
+	- exerciseType
+		-Id
+		-Type

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Repository
 {
-    public interface IBrainerExerciseRepository
+    public interface IExerciseRepository
     {
-        Task<IEnumerable<BrainerExercise>> GetBrainerExercises();
-        Task<BrainerExercise> GetBrainerExercise(int id);
+        Task<IEnumerable<Exercise>> GetBrainerExercises();
+        Task<Exercise> GetBrainerExercise(int id);
     }
 }
