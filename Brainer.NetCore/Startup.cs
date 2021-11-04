@@ -1,5 +1,7 @@
 using Brainer.NetCore.Configuration;
+using Brainer.NetCore.Controllers;
 using Brainer.NetCore.Models;
+using Brainer.NetCore.Models.Entities;
 using Brainer.NetCore.Repository;
 using Brainer.NetCore.Repository.interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,14 +61,16 @@ namespace Brainer.NetCore
                     RequireExpirationTime = false
                 };
             });
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<AppDBContext>();
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<AppDBContext>()
+                .AddUserManager<ApplicationUserManager>();
+            //services.AddIdentity<ApplicationUser, ApplicationUserManager>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<AppDBContext>();
 
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IExerciseRepository, ExerciseRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
-            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

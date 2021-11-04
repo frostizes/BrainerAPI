@@ -1,6 +1,8 @@
 ﻿using Brainer.NetCore.Configuration;
 using Brainer.NetCore.Models.DTOs.Requests;
 using Brainer.NetCore.Models.DTOs.Responses;
+using Brainer.NetCore.Models.Entities;
+using Brainer.NetCore.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -19,13 +21,13 @@ namespace Brainer.NetCore.Controllers
     [ApiController]
     public class AuthManagementContoller : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly JwtConfig jwtConfig;
+        private readonly ApplicationUserManager _userManager;
+        private readonly JwtConfig _jwtConfig;
 
-        public AuthManagementContoller(UserManager<IdentityUser> userManager, IOptionsMonitor<JwtConfig> optionsMonitor)
+        public AuthManagementContoller(ApplicationUserManager userManager, IOptionsMonitor<JwtConfig> optionsMonitor)
         {
-            this.userManager = userManager;
-            jwtConfig = optionsMonitor.CurrentValue;
+            this._userManager = userManager;
+            _jwtConfig = optionsMonitor.CurrentValue;
         }
 
         [HttpPost]
@@ -34,7 +36,7 @@ namespace Brainer.NetCore.Controllers
         {
             if (ModelState.IsValid)
             {
-                var existingUser = await userManager.FindByEmailAsync(userLoginRequest.Email);
+                var existingUser = await _userManager.FindByEmailAsync(userLoginRequest.Email);
                 if(existingUser == null)
                 {
                     return BadRequest(new RegistrationResponse()
@@ -47,7 +49,7 @@ namespace Brainer.NetCore.Controllers
                     });
                 }
 
-                var isCorrect = await userManager.CheckPasswordAsync(existingUser, userLoginRequest.Password);
+                var isCorrect = await _userManager.CheckPasswordAsync(existingUser, userLoginRequest.Password);
                 if (!isCorrect)
                 {
                     return BadRequest(new RegistrationResponse()
@@ -82,9 +84,21 @@ namespace Brainer.NetCore.Controllers
         [Route("register")]
         public async Task<IActionResult> Register(UserRegistrationDTOs user)
         {
+            Console.WriteLine("incoming request");
             if (ModelState.IsValid)
             {
-                var existingUser = await userManager.FindByEmailAsync(user.Email);
+                if (!user.Password.Equals(user.PasswordCheck))
+                {
+                    return BadRequest(new RegistrationResponse()
+                    {
+                        Errors = new List<string>()
+                        {
+                            "Passwords must match"
+                        },
+                        Succes = false
+                    });
+                }
+                var existingUser = await _userManager.FindByEmailAsync(user.Email);
                 if(existingUser != null)
                 {
                     return BadRequest(new RegistrationResponse()
@@ -96,13 +110,14 @@ namespace Brainer.NetCore.Controllers
                         Succes = false
                     });
                 }
-
-                var newUser = new IdentityUser()
+                var newUser = new ApplicationUser()
                 {
                     Email = user.Email,
-                    UserName = user.UserName
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    UserName = user.Email
                 };
-                var isCreated = await userManager.CreateAsync(newUser, user.Password);
+                var isCreated = await _userManager.CreateAsync(newUser, user.Password);
                 if (isCreated.Succeeded)
                 {
                     var jwtToken = GenerateJwtToken(newUser);
@@ -114,7 +129,8 @@ namespace Brainer.NetCore.Controllers
                 }
                 else
                 {
-                    return BadRequest("unable to create user one field is wrong");
+                    var message = string.Join(", ", isCreated.Errors.Select(x => "Code " + x.Code + " Description" + x.Description));
+                    return BadRequest($"unable to create user one field is wrong : {message}");
                 }
             }
 
@@ -131,7 +147,7 @@ namespace Brainer.NetCore.Controllers
         private string GenerateJwtToken(IdentityUser identityUser)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(jwtConfig.Secret);
+            var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]

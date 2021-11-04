@@ -1,7 +1,10 @@
 ﻿using Brainer.NetCore.Models;
 using Brainer.NetCore.Models.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +12,22 @@ using System.Threading.Tasks;
 
 namespace Brainer.NetCore.Repository
 {
-    public class ApplicationUserRepository : IApplicationUserRepository
+    public class ApplicationUserManager : UserManager<ApplicationUser>
     {
         private readonly AppDBContext _appDBContext;
 
-        public ApplicationUserRepository(AppDBContext appDBContext)
+        public ApplicationUserManager(
+        IUserStore<ApplicationUser> store,
+        IOptions<IdentityOptions> optionsAccessor,
+        IPasswordHasher<ApplicationUser> passwordHasher,
+        IEnumerable<IUserValidator<ApplicationUser>> userValidators,
+        IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators,
+        ILookupNormalizer keyNormalizer,
+        IdentityErrorDescriber errors,
+        IServiceProvider services,
+        ILogger<UserManager<ApplicationUser>> logger) :
+        base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
-            this._appDBContext = appDBContext;
         }
 
         public Task<ApplicationUser> AddUser(ApplicationUser user)
